@@ -1,4 +1,4 @@
-# SHA1CertChecker
+# SHA-1 Certificate Checker
 A massively scalable cloud-hosted scanner for SHA-1 thumbprint collision detection in certificate files. 
 
 The solution is designed to orchestrate scans hosted in Microsoft's Azure cloud using C# and .Net (my skillset). Certificate data is provided by Censys and found in Google Cloud's Big Query platform.
@@ -71,7 +71,7 @@ Note: These environment variables must be present in your dev and cloud environm
 * CENSYS_APPID = the application ID used for Censys API access.
 * CENSYS_SECRET_KEY = the secret key used for Censys API access.
 * GOOGLE_APPLICATION_CREDENTIALS = the path to a file containing the key used to connect to input storage.
-* 
+
 
 ## Source Data
 It is expected the input list of certificates to process will be sourced from a Google Cloud Storage bucket that you own. The bucket will contain a series of JSON (newline delimited) files with data sourced from the censys-io.research_1m.certificatesv2 curated dataset hosted in Google's Big Query platform. See https://support.censys.io/hc/en-us/articles/360038761891-Research-Access-to-Censys-Data for details on data access.
