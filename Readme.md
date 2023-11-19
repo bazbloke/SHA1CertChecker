@@ -1,5 +1,5 @@
 # SHA1CertChecker
-A massively scaleable cloud-hosted scanner for SHA-1 thumbprint collision detection in certificates file. 
+A massively scalable cloud-hosted scanner for SHA-1 thumbprint collision detection in certificate files. 
 
 The solution is designed to orchestrate scans hosted in Microsoft's Azure cloud using C# and .Net (my skillset). Certificate data is provided by Censys and found in Google Cloud's Big Query platform.
 
@@ -8,7 +8,7 @@ By Barry Markey, 2023. Published under the terms of the MIT License.
 # Key Components
 
 ## SHA1CertChecker.Shared
-Common code lib shared between the Azure function and commond-line tool.
+Common code lib shared between the Azure function and commannd-line tool.
 
 ## SHA1CertChecker.Test
 The unit test suite.
@@ -107,7 +107,7 @@ __declspec(dllexport) void __cdecl  SHA1DCUpdate(SHA1_CTX*, const char*, size_t)
 __declspec(dllexport) int __cdecl SHA1DCFinal(unsigned char[20], SHA1_CTX*);
 ```
 
-For full transparency, the SHA1CertChecker project also supports running the original sha1dcsum.exe exeutable unaltered, but the performance hit is significant.
+For full transparency, the SHA1CertChecker project also supports running the original sha1dcsum.exe executable unaltered, but the performance hit is significant.
 
 
 ## Gratitude
