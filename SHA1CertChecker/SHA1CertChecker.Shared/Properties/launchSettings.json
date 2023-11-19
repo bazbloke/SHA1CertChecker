@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SHA1CertChecker.Shared": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

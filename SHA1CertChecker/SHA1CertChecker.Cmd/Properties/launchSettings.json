@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SHA1CertChecker.Cmd": {
+      "commandName": "Project",
+      "commandLineArgs": "add data",
+      "nativeDebugging": true
+    }
+  }
+}
