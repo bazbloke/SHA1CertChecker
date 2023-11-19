@@ -17,7 +17,7 @@ The unit test suite.
 An Azure Function designed to operate the analysis at cloud scale. 
 
 ## SHA1CertChecker.Cmd
-A commad-line tool to automate the certificate analysis process. Suported verbs allow for the submission of data to work function pool and local analysis of a set of certificates.
+A command-line tool to automate the certificate analysis process. Supported verbs allow for the submission of certificate data to the function worker pool and local analysis of a set of certificates.
 
 ## Example Commands
 ```
@@ -66,18 +66,18 @@ Copyright (C) 2023 SHA1CertChecker.Cmd
   --version       Display version information.
 ```
 
-## Data
-It is expected that input list of certificates to process will be sourced from a Google Cloud Storage bucket that you own. The bucket will contain a series of JSON (newline delimited) files with data sourced 
-from the censys-io.research_1m.certificatesv2 curated dataset hosted in Google's Big Query platform. See https://support.censys.io/hc/en-us/articles/360038761891-Research-Access-to-Censys-Data for details on data access.
+## Source Data
+It is expected the input list of certificates to process will be sourced from a Google Cloud Storage bucket that you own. The bucket will contain a series of JSON (newline delimited) files with data sourced from the censys-io.research_1m.certificatesv2 curated dataset hosted in Google's Big Query platform. See https://support.censys.io/hc/en-us/articles/360038761891-Research-Access-to-Censys-Data for details on data access.
 
-The data is expected to reside in a Google Cloud storage bucket named 'data' and data should in GZipped into JSON. This was chosen since it was the best option offered by the Big Query Export feature. The size of the files is
-dynamically chosen by Big Query at the time of export. Depending on how much data is selected, file sizes may vary between 40mb and 130mb. Partitioning the source data into sets of 1 billion rows seemed effective.
+The data is expected to reside in a Google Cloud storage bucket named 'data' and should be GZipped into JSON. This was chosen since it was the best option offered by the Big Query Export feature. The size of the files is dynamically chosen by Big Query at the time of export. Depending on how much data is selected, file sizes may vary between 40mb and 130mb. Partitioning the source data into sets of 1 billion rows seemed effective.
 
-Each row of the input data should follow this schema which closely matches the naming convention of the original data in the Censys certificatesv32 dataset:
+Each row of the input data should follow this schema which closely matches the naming convention of the original data in the Censys certificatesv2 dataset:
 
-	{"fingerprint_sha256": "ErBp3PS7/F2SpYBK3K2fd47Rc1UEiuQg6dYPymaLDwc=","raw": "MIIE/..."}
+	{"fingerprint_sha256": "[Bas64 Encoded Hash]","raw": "[Base64Encoded Cert Data]"}
 
-This query was used to select the overall set of certificates. As of November 2023 this returned 3.2 billion rows.
+This query was used to select the overall set of certificates. As of November 2023 it returned 3.2 billion rows.
+
+```
 SELECT
   fingerprint_sha256,
   raw
@@ -86,7 +86,7 @@ FROM
   WHERE 
     parsed.validity_period.not_before >= TIMESTAMP('2023-01-01') AND
     added_at >= TIMESTAMP('2023-01-01')
-
+```
 
 ## Dependencies
 This essence of this project is a means to automate the analysis of raw certificate .DER files looking for tell-tale signs the file was crafted to produce a given SHA-1 hash thumbprint.
@@ -95,15 +95,19 @@ The core analysis logic is performed by the sha1dcsum tool, copyright 2017 by Ma
 
 The code for this project can be found at https://github.com/cr-marcstevens/sha1collisiondetection
 
-For performance reasons, SHA1CertChecker takes a binary dependency on the sha1dcsum project. To achieve this it was necessary to recompile the code as a .DLL and that needed a few changes to the
-function definitions in sha1.h, as follows:
+For performance reasons, SHA1CertChecker takes a binary dependency on the sha1dcsum tool. To achieve this it was necessary to recompile the code as a .DLL and also needed a few changes to the function definitions in sha1.h, as follows:
 
+```
 __declspec(dllexport) void __cdecl SHA1DCInit(SHA1_CTX*);
-__declspec(dllexport) void __cdecl SHA1DCSetSafeHash(SHA1_CTX*, int);
-__declspec(dllexport) void __cdecl  SHA1DCUpdate(SHA1_CTX*, const char*, size_t);
-__declspec(dllexport) int __cdecl SHA1DCFinal(unsigned char[20], SHA1_CTX*);
 
-For full transparency, the SHA1CertChecker projects also supports running the original sha1dcsum.exe exeutable unaltered, but the performance hit is significant.
+__declspec(dllexport) void __cdecl SHA1DCSetSafeHash(SHA1_CTX*, int);
+
+__declspec(dllexport) void __cdecl  SHA1DCUpdate(SHA1_CTX*, const char*, size_t);
+
+__declspec(dllexport) int __cdecl SHA1DCFinal(unsigned char[20], SHA1_CTX*);
+```
+
+For full transparency, the SHA1CertChecker project also supports running the original sha1dcsum.exe exeutable unaltered, but the performance hit is significant.
 
 
 ## Gratitude
